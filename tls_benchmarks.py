@@ -3,7 +3,7 @@ import time
 import statistics
 import matplotlib.pyplot as plt
 import numpy as np
-from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives.asymmetric import rsa, padding, ec
 from cryptography.hazmat.primitives import hashes
 import oqs
 
@@ -35,14 +35,16 @@ def real_rsa_decrypt(private_key, ciphertext):
     )
 
 def real_ecdhe_keygen():
-    time.sleep(0.0005)  # Placeholder: real ECDHE not implemented in this example
-    return "ECDHE_PUBLIC", "ECDHE_PRIVATE"
+    private_key = ec.generate_private_key(ec.SECP256R1())  # NIST P-256 
+    public_key = private_key.public_key()
+    return public_key, private_key
 
-def real_ecdhe_handshake(pubA, privB):
+def real_ecdhe_handshake(peer_public_key, private_key):
     start = time.perf_counter()
-    time.sleep(0.001)
-    return time.perf_counter() - start
-
+    shared_key = private_key.exchange(ec.ECDH(), peer_public_key)
+    end = time.perf_counter()
+    return end - start
+    
 def real_kyber_keygen():
     kem = oqs.KeyEncapsulation("Kyber768")
     public_key = kem.generate_keypair()
