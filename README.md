@@ -195,5 +195,3 @@ These results include:
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
-
-By following the instructions above, you should be able to install all necessary dependencies (including the OQS library), run the benchmarks, and visualize the results. Enjoy your journey into post-quantum cryptography benchmarking!
