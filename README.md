@@ -12,6 +12,7 @@ This repository contains a Python script that benchmarks cryptographic operation
 
 **Georgia Institute of Technology**
 **Atlanta, United States**
+
 **Authors:**  
 - Zhuolin Li
 - Tyler Jeng 
