@@ -1,7 +1,3 @@
-Below is an extremely detailed example of a README.md file that explains how to install the necessary environment, how to install the oqs library (and its dependencies), how to run the benchmark script, and what the expected results are. Make sure to follow the instructions exactly and note that **you must not use Google Colab** as a development or testing environment.
-
----
-
 # Post-Quantum TLS Benchmark
 
 This repository contains a Python script that benchmarks cryptographic operations for both traditional TLS and hybrid (post-quantum) TLS schemes. The script performs several tests—such as ECDHE key generation, RSA encryption/decryption, Kyber encapsulation/decapsulation, as well as ECDSA signing and verification—and visualizes the results using bar charts.
