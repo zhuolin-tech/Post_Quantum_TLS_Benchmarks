@@ -166,6 +166,19 @@ Hybrid TLS Results:
   Hybrid (ECDHE+Kyber768): 2464.000000
 ```
 
+![image](https://github.com/user-attachments/assets/e2cfe1c5-8936-4b42-b8a0-8c3580e3057e)
+
+![image](https://github.com/user-attachments/assets/96c24d6f-f639-4970-8164-d3ca50dbb61c)
+
+![image](https://github.com/user-attachments/assets/72068aca-697d-4fff-b44c-74c54de9c237)
+
+![image](https://github.com/user-attachments/assets/404f6fbd-9397-4f99-bedb-c190e23622e5)
+
+![image](https://github.com/user-attachments/assets/727dd602-71d8-47ed-b71e-409c52fc0495)
+
+![image](https://github.com/user-attachments/assets/c2117114-18a8-4f34-9b5d-cfa574e8e622)
+
+
 These results include:
 - Average times for ECDHE handshake, RSA encryption and decryption in the traditional TLS scheme.
 - Average times for Kyber encapsulation and decapsulation in the hybrid TLS scheme.
