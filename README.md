@@ -16,7 +16,7 @@ This repository contains a Python script that benchmarks cryptographic operation
 - Shruti Kakubal, tjeng7@gatech.edu
 - Delaney Gomen, dgomen3@gatech.edu
 
-This project is part of CS6262 Computer Network Security (Spring 2025) Course Project at the **Georgia Institute of Technology**. All rights and intellectual property of this work belong to the above-listed authors.
+This project is part of CS6262 Computer Network Security (Spring 2025) Course Project at the **Georgia Institute of Technology**.
 
 ---
 
