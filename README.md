@@ -14,7 +14,7 @@ This repository contains a Python script that benchmarks cryptographic operation
 - Shruti Kakubal
 - Zhuolin Li
 - Delaney Gomen
-- Georgia Institute of Technology, Atlanta, United States
+Georgia Institute of Technology, Atlanta, United States
 
 This project is part of the Spring 2025 Computer Network Security Project Course at the Georgia Institute of Technology. All rights and intellectual property of this work belong to the above-listed authors.
 
