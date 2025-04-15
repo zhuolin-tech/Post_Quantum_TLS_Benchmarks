@@ -10,17 +10,13 @@ This repository contains a Python script that benchmarks cryptographic operation
 
 **Hybrid Classical-Quantum Cryptography in a Post-Quantum World**  
 
-**Georgia Institute of Technology**
-
-**Atlanta, United States**
-
 **Authors:**  
-- Zhuolin Li
-- Tyler Jeng 
-- Shruti Kakubal
-- Delaney Gomen
+- Zhuolin Li, zhuolin@gatech.edu
+- Tyler Jeng, skakubal3@gatech.edu
+- Shruti Kakubal, tjeng7@gatech.edu
+- Delaney Gomen, dgomen3@gatech.edu
 
-This project is part of the Spring 2025 Computer Network Security Course Project at the Georgia Institute of Technology. All rights and intellectual property of this work belong to the above-listed authors.
+This project is part of CS6262 Computer Network Security (Spring 2025) Course Project at the **Georgia Institute of Technology**. All rights and intellectual property of this work belong to the above-listed authors.
 
 ---
 
@@ -224,9 +220,4 @@ These results include:
 ## License
 
 This project is licensed under the MIT License.
-
----
-
-## License
-
 
