@@ -132,6 +132,10 @@ def real_kyber_decapsulate(kem, ciphertext):
 
 # ============ 2. Benchmark Functions ============
 
+def time_to_cpu_kcycles(time):
+    CPU_FREQ_HZ = 2.4e9 # WILL BE DIFFERENT FOR DIFFERENT COMPUTERS
+    return (time * CPU_FREQ_HZ) / 1000 
+
 def test_traditional_tls(rounds=10):
     """
     Test and benchmark traditional TLS operations using RSA and ECDHE.
@@ -149,7 +153,10 @@ def test_traditional_tls(rounds=10):
     pub_ec, priv_ec = real_ecdhe_keygen()
 
     # Benchmark ECDHE handshake by performing key exchange multiple times
-    ecdhe_times = [real_ecdhe_handshake(pub_ec, priv_ec) for _ in range(rounds)]
+    ecdhe_times = [
+        time_to_cpu_kcycles(real_ecdhe_handshake(pub_ec, priv_ec))
+        for _ in range(rounds)
+        ]
 
     encrypt_times = []
     decrypt_times = []
@@ -158,12 +165,12 @@ def test_traditional_tls(rounds=10):
         enc_start = time.perf_counter()
         ciphertext = real_rsa_encrypt(public_key, data)
         enc_end = time.perf_counter()
-        encrypt_times.append(enc_end - enc_start)
+        encrypt_times.append(time_to_cpu_kcycles(enc_end - enc_start))
 
         dec_start = time.perf_counter()
         _ = real_rsa_decrypt(private_key, ciphertext)
         dec_end = time.perf_counter()
-        decrypt_times.append(dec_end - dec_start)
+        decrypt_times.append(time_to_cpu_kcycles(dec_end - dec_start))
 
     return {
         "ECDHE_handshake_avg": statistics.mean(ecdhe_times),
@@ -193,11 +200,13 @@ def test_hybrid_tls(rounds=10):
     kem_dec_times = []
 
     for _ in range(rounds):
-        ecdhe_times.append(real_ecdhe_handshake(pub_ec, priv_ec))
+        ecdhe_times.append(
+            time_to_cpu_kcycles(real_ecdhe_handshake(pub_ec, priv_ec))
+            )
         enc_time, ciphertext = real_kyber_encapsulate(kem, public_key)
-        kem_enc_times.append(enc_time)
+        kem_enc_times.append(time_to_cpu_kcycles(enc_time))
         dec_time = real_kyber_decapsulate(kem, ciphertext)
-        kem_dec_times.append(dec_time)
+        kem_dec_times.append(time_to_cpu_kcycles(dec_time))
 
     # Free resources associated with the KEM object
     kem.free()
@@ -221,7 +230,7 @@ def test_ecdhe_keygen(rounds=10):
     for _ in range(rounds):
         start = time.perf_counter()
         _ = real_ecdhe_keygen()
-        times.append(time.perf_counter() - start)
+        times.append(time_to_cpu_kcycles(time.perf_counter() - start))
     return statistics.mean(times)
 
 
@@ -244,12 +253,12 @@ def test_ecdsa_sign_and_verify(rounds=10):
         sign_start = time.perf_counter()
         signature = private_key.sign(message, ec.ECDSA(hashes.SHA256()))
         sign_end = time.perf_counter()
-        sign_times.append(sign_end - sign_start)
+        sign_times.append(time_to_cpu_kcycles(sign_end - sign_start))
 
         verify_start = time.perf_counter()
         public_key.verify(signature, message, ec.ECDSA(hashes.SHA256()))
         verify_end = time.perf_counter()
-        verify_times.append(verify_end - verify_start)
+        verify_times.append(time_to_cpu_kcycles(verify_end - verify_start))
     return statistics.mean(sign_times), statistics.mean(verify_times)
 
 
@@ -364,23 +373,23 @@ if __name__ == "__main__":
     # Benchmark ECDHE Key Generation Performance
     print("\nRunning ECDHE Key Generation Benchmark...")
     ecdhe_keygen_avg = test_ecdhe_keygen(rounds)
-    print(f"ECDHE KeyGen Avg: {ecdhe_keygen_avg:.6f} s")
+    print(f"ECDHE KeyGen Avg: {ecdhe_keygen_avg:.6f} cycles")
 
     # Benchmark ECDSA Signing and Verification Performance
     print("\nRunning ECDSA Signing and Verification Benchmark...")
     ecdsa_sign_avg, ecdsa_verify_avg = test_ecdsa_sign_and_verify(rounds)
-    print(f"ECDSA Sign   Avg: {ecdsa_sign_avg:.6f} s")
-    print(f"ECDSA Verify Avg: {ecdsa_verify_avg:.6f} s")
+    print(f"ECDSA Sign   Avg: {ecdsa_sign_avg:.6f} cycles")
+    print(f"ECDSA Verify Avg: {ecdsa_verify_avg:.6f} cycles")
 
     # Print Traditional TLS benchmark results to console
     print("\nTraditional TLS Results:")
     for k, v in trad_result.items():
-        print(f"  {k}: {v:.6f} s")
+        print(f"  {k}: {v:.6f} cycles")
 
     # Print Hybrid TLS benchmark results to console
     print("\nHybrid TLS Results:")
     for k, v in hybrid_result.items():
-        print(f"  {k}: {v:.6f} s")
+        print(f"  {k}: {v:.6f} cycles")
 
     # Plot benchmark results for Traditional TLS operations
     plot_bar_chart("Traditional TLS (Average Time)",
@@ -388,21 +397,22 @@ if __name__ == "__main__":
                    [trad_result["ECDHE_handshake_avg"],
                     trad_result["RSA_encrypt_avg"],
                     trad_result["RSA_decrypt_avg"]],
-                   "Time (seconds)")
+                   "Average k CPU Cycles")
 
+    # Missing Key Generation time for Kyber 
     # Plot benchmark results for Hybrid TLS operations
     plot_bar_chart("Hybrid Post-Quantum TLS (Average Time)",
                    ["ECDHE Handshake", "Kyber Encapsulate", "Kyber Decapsulate"],
                    [hybrid_result["ECDHE_handshake_avg"],
                     hybrid_result["Kyber_encapsulate_avg"],
                     hybrid_result["Kyber_decapsulate_avg"]],
-                   "Time (seconds)")
+                   "Average k CPU Cycles")
 
     # Plot benchmark results for ECDHE/ECDSA performance (Key Generation, Signing, and Verification)
     plot_bar_chart("ECDHE/ECDSA Performance",
                    ["KeyGen", "Sign", "Verify"],
                    [ecdhe_keygen_avg, ecdsa_sign_avg, ecdsa_verify_avg],
-                   "Time (seconds)")
+                   "Average k CPU Cycles")
 
     # Plot security level (in bits) for each algorithm
     algorithms = list(algo_info.keys())
