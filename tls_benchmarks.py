@@ -10,7 +10,7 @@ import oqs  # Open Quantum Safe library for post-quantum cryptography
 
 # ============ 1. Cryptographic Operations ============
 
-def real_rsa_keygen():
+def rsa_keygen():
     """
     Generate an RSA key pair with a 2048-bit modulus.
     Returns:
@@ -21,8 +21,54 @@ def real_rsa_keygen():
     public_key = private_key.public_key()
     return public_key, private_key
 
+def rsa_sign(private_key, data):
+    """
+    Sign data using the RSA private key with PSS padding.
+    Args:
+        private_key: The RSA private key for signing.
+        data: The data to sign (bytes).
+    Returns:
+        signature: The signature of the data.
+    """
+    # Sign the data using PSS padding with SHA-256
+    signature = private_key.sign(
+        data,
+        padding.PSS(
+            mgf=padding.MGF1(hashes.SHA256()),
+            salt_length=padding.PSS.MAX_LENGTH
+        ),
+        hashes.SHA256()
+    )
+    return signature
 
-def real_rsa_encrypt(public_key, data):
+def rsa_verify(public_key, signature, data):
+    """
+    Verify the signature of data using the RSA public key with PSS padding.
+    Args:
+        public_key: The RSA public key for verification.
+        signature: The signature to verify.
+        data: The data that was signed.
+    Returns:
+        True if the signature is valid, False otherwise.
+    """
+    try:
+        # Verify the signature using the same padding and hash algorithm
+        public_key.verify(
+            signature,
+            data,
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH
+            ),
+            hashes.SHA256()
+        )
+        # If verification succeeds (no exception is raised), return True
+        return True
+    except Exception:
+        # If verification fails, an exception is raised, return False
+        return False
+
+def rsa_encrypt(public_key, data):
     """
     Encrypt data using the RSA public key with OAEP padding.
     Args:
@@ -40,8 +86,7 @@ def real_rsa_encrypt(public_key, data):
         )
     )
 
-
-def real_rsa_decrypt(private_key, ciphertext):
+def rsa_decrypt(private_key, ciphertext):
     """
     Decrypt data using the RSA private key with OAEP padding.
     Args:
@@ -59,8 +104,7 @@ def real_rsa_decrypt(private_key, ciphertext):
         )
     )
 
-
-def real_ecdhe_keygen():
+def ecdhe_keygen():
     """
     Generate an ephemeral ECDHE key pair using the SECP256R1 elliptic curve.
     Returns:
@@ -71,23 +115,46 @@ def real_ecdhe_keygen():
     public_key = private_key.public_key()
     return public_key, private_key
 
-
-def real_ecdhe_handshake(peer_public_key, private_key):
+def ecdsa_sign(private_key, data):
     """
-    Simulate an ECDHE key exchange operation (handshake) by computing the shared key.
+    Sign data using the ECDSA algorithm with SHA-256 hash.
     Args:
-        peer_public_key: The public key from the other party.
-        private_key: The local private key.
+        private_key: The ECDSA private key for signing.
+        data: The data to sign (bytes).
     Returns:
-        elapsed_time: The time taken (in seconds) to perform the key exchange.
+        signature: The signature of the data.
     """
-    start = time.perf_counter()
-    _ = private_key.exchange(ec.ECDH(), peer_public_key)
-    end = time.perf_counter()
-    return end - start
+    # Sign the data using ECDSA with SHA-256
+    signature = private_key.sign(
+        data,
+        ec.ECDSA(hashes.SHA256())
+    )
+    return signature
 
+def ecdsa_verify(public_key, signature, data):
+    """
+    Verify the ECDSA signature of data using the public key.
+    Args:
+        public_key: The ECDSA public key for verification.
+        signature: The signature to verify.
+        data: The data that was signed.
+    Returns:
+        True if the signature is valid, False otherwise.
+    """
+    try:
+        # Verify the signature using ECDSA with SHA-256
+        public_key.verify(
+            signature,
+            data,
+            ec.ECDSA(hashes.SHA256())
+        )
+        # If verification succeeds (no exception is raised), return True
+        return True
+    except Exception:
+        # If verification fails, an exception is raised, return False
+        return False
 
-def real_kyber_keygen():
+def kyber_keygen():
     """
     Generate a key pair using the post-quantum key encapsulation mechanism (KEM) Kyber768.
     Returns:
@@ -98,8 +165,7 @@ def real_kyber_keygen():
     public_key = kem.generate_keypair()
     return kem, public_key
 
-
-def real_kyber_encapsulate(kem, public_key):
+def kyber_encapsulate(kem, public_key):
     """
     Perform the encapsulation operation of Kyber768 KEM to generate a ciphertext and shared secret.
     Args:
@@ -115,7 +181,7 @@ def real_kyber_encapsulate(kem, public_key):
     return end - start, ciphertext
 
 
-def real_kyber_decapsulate(kem, ciphertext):
+def kyber_decapsulate(kem, ciphertext):
     """
     Perform the decapsulation operation of Kyber768 KEM to recover the shared secret.
     Args:
@@ -130,92 +196,579 @@ def real_kyber_decapsulate(kem, ciphertext):
     return end - start
 
 
+def mldsa_keygen():
+    """
+    Generate a key pair using the ML-DSA (CRYSTALS-Dilithium) post-quantum signature algorithm.
+    Returns:
+        private_key: The ML-DSA signature object instance.
+        public_key: The ML-DSA public key used for verification.
+    """
+    # Create a Dilithium signature object
+    private_key = oqs.Signature("Dilithium3")
+    # Generate the keypair - public key is returned, private key is stored in sig object
+    public_key = private_key.generate_keypair()
+    return private_key, public_key
+
+
+def mldsa_sign(private_key, data):
+    """
+    Sign data using the ML-DSA (CRYSTALS-Dilithium) algorithm.
+    Args:
+        private_key: The ML-DSA signature object instance (contains private key).
+        data: The data to sign (bytes).
+    Returns:
+        signature: The signature of the data.
+    """
+    # Sign the data using ML-DSA
+    signature = private_key.sign(data)
+    return signature
+
+
+def mldsa_verify(private_key, public_key, signature, data):
+    """
+    Verify the ML-DSA signature of data using the public key.
+    Args:
+        private_key: The ML-DSA signature object instance.
+        public_key: The ML-DSA public key for verification.
+        signature: The signature to verify.
+        data: The data that was signed.
+    Returns:
+        True if the signature is valid, False otherwise.
+    """
+    try:
+        # Verify the signature using ML-DSA
+        result = private_key.verify(data, signature, public_key)
+        return result
+    except Exception:
+        # If verification fails, an exception is raised, return False
+        return False
+
+def falcon_keygen():
+    """
+    Generate a key pair using the Falcon post-quantum signature algorithm.
+    Returns:
+        private_key: The Falcon signature object instance.
+        public_key: The Falcon public key used for verification.
+    """
+    # Create a Falcon signature object
+    private_key = oqs.Signature("Falcon-512")
+    # Generate the keypair - public key is returned, private key is stored in sig object
+    public_key = private_key.generate_keypair()
+    return private_key, public_key
+
+
+def falcon_sign(private_key, data):
+    """
+    Sign data using the Falcon algorithm.
+    Args:
+        private_key: The Falcon signature object instance (contains private key).
+        data: The data to sign (bytes).
+    Returns:
+        signature: The signature of the data.
+    """
+    # Sign the data using Falcon
+    signature = private_key.sign(data)
+    return signature
+
+
+def falcon_verify(private_key, public_key, signature, data):
+    """
+    Verify the Falcon signature of data using the public key.
+    Args:
+        private_key: The Falcon signature object instance.
+        public_key: The Falcon public key for verification.
+        signature: The signature to verify.
+        data: The data that was signed.
+    Returns:
+        True if the signature is valid, False otherwise.
+    """
+    try:
+        # Verify the signature using Falcon
+        result = private_key.verify(data, signature, public_key)
+        return result
+    except Exception:
+        # If verification fails, an exception is raised, return False
+        return False
+
 # ============ 2. Benchmark Functions ============
 
 def time_to_cpu_kcycles(time):
     CPU_FREQ_HZ = 2.4e9 # WILL BE DIFFERENT FOR DIFFERENT COMPUTERS
-    return (time * CPU_FREQ_HZ) / 1000 
+    return (time * CPU_FREQ_HZ) / 1000
 
-def test_traditional_tls(rounds=10):
+def test_traditional_tls_rsa_kex():
     """
-    Test and benchmark traditional TLS operations using RSA and ECDHE.
+    Test and benchmark TLS 1.2 handshake using pure RSA key‑exchange.
     It benchmarks the following:
-        - ECDHE handshake time
-        - RSA encryption time
-        - RSA decryption time
-    Args:
-        rounds: Number of iterations for each test.
+        - RSA keypair generation time (KeyGen)
+        - Certificate chain signature verification time (Verify)
+        - RSA encryption of the pre‑master secret (Encrypt)
+        - RSA decryption of the pre‑master secret (Decrypt)
     Returns:
-        A dictionary with average times for:
-            "ECDHE_handshake_avg", "RSA_encrypt_avg", "RSA_decrypt_avg"
+        A dict with average times for:
+            "RSA_keygen_avg",
+            "Cert_verify_avg",
+            "RSA_encrypt_avg",
+            "RSA_decrypt_avg"
     """
-    public_key, private_key = real_rsa_keygen()
-    pub_ec, priv_ec = real_ecdhe_keygen()
+    # Measure RSA key generation time
+    start = time.perf_counter()
+    public_key, private_key = rsa_keygen()
+    keygen_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Simulate certificate verification (using RSA verify as proxy)
+    cert_data = b"TLS Certificate Chain Data"
+    # Generate a signature for the certificate data
+    cert_signature = rsa_sign(private_key, cert_data)
+    
+    start = time.perf_counter()
+    _ = rsa_verify(public_key, cert_signature, cert_data)
+    cert_verify_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Measure RSA encryption of pre-master secret
+    pre_master_secret = b"A" * 190  # Simulated pre-master secret
+    
+    start = time.perf_counter()
+    ciphertext = rsa_encrypt(public_key, pre_master_secret)
+    encrypt_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Measure RSA decryption of pre-master secret
+    start = time.perf_counter()
+    _ = rsa_decrypt(private_key, ciphertext)
+    decrypt_time = time_to_cpu_kcycles(time.perf_counter() - start)
 
-    # Benchmark ECDHE handshake by performing key exchange multiple times
-    ecdhe_times = [
-        time_to_cpu_kcycles(real_ecdhe_handshake(pub_ec, priv_ec))
-        for _ in range(rounds)
-        ]
+    return {
+        "RSA_keygen_avg": keygen_time,
+        "Cert_verify_avg": cert_verify_time,
+        "RSA_encrypt_avg": encrypt_time,
+        "RSA_decrypt_avg": decrypt_time
+    }
 
+
+def test_traditional_tls_ecdhe_rsa():
+    """
+    Test and benchmark TLS 1.2 ECDHE_RSA handshake.
+    It benchmarks the following:
+        - ECDHE ephemeral keypair generation time (KeyGen)
+        - RSA signing of the ServerKeyShare (Sign)
+        - RSA verification of ServerKeyShare and certificate chain (Verify)
+        - symmetric encryption of Finished message (Encrypt)
+        - symmetric decryption of Finished message (Decrypt)
+    Returns:
+        A dict with average times for:
+            "ECDHE_keygen_avg",
+            "RSA_sign_avg",
+            "RSA_verify_avg",
+            "Finished_encrypt_avg",       
+            "Finished_decrypt_avg"        
+    """
+    # Generate RSA keys for certificate operations
+    rsa_pub_key, rsa_priv_key = rsa_keygen()
+    
+    # Measure ECDHE key generation time
+    start = time.perf_counter()
+    ec_pub_key, ec_priv_key = ecdhe_keygen()
+    ecdhe_keygen_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Simulate ServerKeyShare data
+    server_key_share = b"ECDHE Server Key Share Data"
+    
+    # Measure RSA signing time for ServerKeyShare
+    start = time.perf_counter()
+    signature = rsa_sign(rsa_priv_key, server_key_share)
+    rsa_sign_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Measure RSA verification time
+    start = time.perf_counter()
+    _ = rsa_verify(rsa_pub_key, signature, server_key_share)
+    rsa_verify_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Simulate symmetric encryption/decryption using RSA as a proxy
+    # (In real TLS, this would use AES or another symmetric cipher)
+    finished_message = b"TLS Finished Message"
+    
+    # Encrypt using RSA as a proxy for symmetric encryption
+    start = time.perf_counter()
+    ciphertext = rsa_encrypt(rsa_pub_key, finished_message[:190])  # Truncate to fit RSA
+    encrypt_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Decrypt using RSA as a proxy for symmetric decryption
+    start = time.perf_counter()
+    _ = rsa_decrypt(rsa_priv_key, ciphertext)
+    decrypt_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    return {
+        "ECDHE_keygen_avg": ecdhe_keygen_time,
+        "RSA_sign_avg": rsa_sign_time,
+        "RSA_verify_avg": rsa_verify_time,
+        "Finished_encrypt_avg": encrypt_time,
+        "Finished_decrypt_avg": decrypt_time
+    }
+
+
+def test_traditional_tls_ecdhe_certsign():
+    """
+    Test and benchmark TLS 1.3 handshake with ECDHE + certificate‑based signature.
+    It benchmarks the following:
+        - ECDHE ephemeral keypair generation time (KeyGen)
+        - Certificate signature (e.g., ECDSA) over handshake transcripts (Sign)
+        - Verification of the certificate chain and handshake signature (Verify)
+        - symmetric encryption of Finished/0-RTT messages (Encrypt)
+        - symmetric decryption of Finished/0-RTT messages (Decrypt)
+    Returns:
+        A dict with average times for:
+            "ECDHE_keygen_avg",
+            "CertSign_sign_avg",
+            "CertSign_verify_avg",
+            "Finished_encrypt_avg",       
+            "Finished_decrypt_avg"        
+    """
+    # Measure ECDHE key generation time
+    start = time.perf_counter()
+    ec_pub_key, ec_priv_key = ecdhe_keygen()
+    ecdhe_keygen_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Simulate handshake transcript data
+    handshake_transcript = b"TLS 1.3 Handshake Transcript Data"
+    
+    # Measure ECDSA signing time for certificate
+    start = time.perf_counter()
+    signature = ecdsa_sign(ec_priv_key, handshake_transcript)
+    cert_sign_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Measure ECDSA verification time
+    start = time.perf_counter()
+    _ = ecdsa_verify(ec_pub_key, signature, handshake_transcript)
+    cert_verify_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Generate RSA keys to simulate symmetric encryption (as a proxy)
+    rsa_pub_key, rsa_priv_key = rsa_keygen()
+    
+    # Simulate Finished/0-RTT message
+    finished_message = b"TLS 1.3 Finished Message"
+    
+    # Encrypt using RSA as a proxy for symmetric encryption
+    start = time.perf_counter()
+    ciphertext = rsa_encrypt(rsa_pub_key, finished_message[:190])  # Truncate to fit RSA
+    encrypt_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Decrypt using RSA as a proxy for symmetric decryption
+    start = time.perf_counter()
+    _ = rsa_decrypt(rsa_priv_key, ciphertext)
+    decrypt_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    return {
+        "ECDHE_keygen_avg": ecdhe_keygen_time,
+        "CertSign_sign_avg": cert_sign_time,
+        "CertSign_verify_avg": cert_verify_time,
+        "Finished_encrypt_avg": encrypt_time,
+        "Finished_decrypt_avg": decrypt_time
+    }
+
+
+def test_hybrid_tls_kyber():
+    """
+    Test and benchmark a hybrid TLS handshake combining ECDHE and Kyber KEM.
+    It benchmarks the following:
+        - ECDHE ephemeral keypair generation time (KeyGen)
+        - Kyber keypair generation time (KeyGen)
+        - Certificate signature/authentication time (Sign)
+        - Verification of the certificate chain and signature (Verify)
+        - Kyber encapsulation time (Encapsulate)
+        - Kyber decapsulation time (Decapsulate)
+    Returns:
+        A dict with average times for:
+            "ECDHE_keygen_avg",
+            "Kyber_keygen_avg",
+            "CertSign_sign_avg",
+            "CertSign_verify_avg",
+            "Kyber_encapsulate_avg",
+            "Kyber_decapsulate_avg"
+    """
+    # Measure ECDHE key generation time
+    start = time.perf_counter()
+    ec_pub_key, ec_priv_key = ecdhe_keygen()
+    ecdhe_keygen_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Measure Kyber key generation time
+    start = time.perf_counter()
+    kem, kyber_pub_key = kyber_keygen()
+    kyber_keygen_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Simulate handshake transcript data
+    handshake_transcript = b"Hybrid TLS Handshake Transcript Data"
+    
+    # Measure ECDSA signing time for certificate
+    start = time.perf_counter()
+    signature = ecdsa_sign(ec_priv_key, handshake_transcript)
+    cert_sign_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Measure ECDSA verification time
+    start = time.perf_counter()
+    _ = ecdsa_verify(ec_pub_key, signature, handshake_transcript)
+    cert_verify_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Measure Kyber encapsulation time
+    encap_time, ciphertext = kyber_encapsulate(kem, kyber_pub_key)
+    kyber_encap_time = time_to_cpu_kcycles(encap_time)
+    
+    # Measure Kyber decapsulation time
+    decap_time = kyber_decapsulate(kem, ciphertext)
+    kyber_decap_time = time_to_cpu_kcycles(decap_time)
+    
+    # Free Kyber resources
+    kem.free()
+    
+    return {
+        "ECDHE_keygen_avg": ecdhe_keygen_time,
+        "Kyber_keygen_avg": kyber_keygen_time,
+        "CertSign_sign_avg": cert_sign_time,
+        "CertSign_verify_avg": cert_verify_time,
+        "Kyber_encapsulate_avg": kyber_encap_time,
+        "Kyber_decapsulate_avg": kyber_decap_time
+    }
+
+
+def test_hybrid_tls_falcon():
+    """
+    Test and benchmark a hybrid TLS handshake with ECDHE+Kyber KEM and Falcon post‑quantum signatures.
+    It benchmarks the following:
+        - ECDHE ephemeral keypair generation time (KeyGen)
+        - Kyber keypair generation time (KeyGen)
+        - Falcon‑512 signature generation time on handshake data (Sign)
+        - Falcon‑512 signature verification time (Verify)
+        - Verification of the certificate chain (still using classic certs) (Verify)
+        - Kyber encapsulation time (Encapsulate)
+        - Kyber decapsulation time (Decapsulate)
+    Returns:
+        A dict with average times for:
+            "ECDHE_keygen_avg",
+            "Kyber_keygen_avg",
+            "Falcon_sign_avg",
+            "Falcon_verify_avg",
+            "Cert_verify_avg",
+            "Kyber_encapsulate_avg",
+            "Kyber_decapsulate_avg"
+    """
+    # Measure ECDHE key generation time
+    start = time.perf_counter()
+    ec_pub_key, ec_priv_key = ecdhe_keygen()
+    ecdhe_keygen_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Measure Kyber key generation time
+    start = time.perf_counter()
+    kem, kyber_pub_key = kyber_keygen()
+    kyber_keygen_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Generate Falcon keys
+    falcon_priv_key, falcon_pub_key = falcon_keygen()
+    
+    # Simulate handshake transcript data
+    handshake_transcript = b"Hybrid TLS with Falcon Handshake Transcript Data"
+    
+    # Measure Falcon signing time
+    start = time.perf_counter()
+    signature = falcon_sign(falcon_priv_key, handshake_transcript)
+    falcon_sign_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Measure Falcon verification time
+    start = time.perf_counter()
+    _ = falcon_verify(falcon_priv_key, falcon_pub_key, signature, handshake_transcript)
+    falcon_verify_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Simulate certificate verification (using ECDSA as proxy for classic certs)
+    cert_data = b"TLS Certificate Chain Data"
+    cert_signature = ecdsa_sign(ec_priv_key, cert_data)
+    
+    start = time.perf_counter()
+    _ = ecdsa_verify(ec_pub_key, cert_signature, cert_data)
+    cert_verify_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Measure Kyber encapsulation time
+    encap_time, ciphertext = kyber_encapsulate(kem, kyber_pub_key)
+    kyber_encap_time = time_to_cpu_kcycles(encap_time)
+    
+    # Measure Kyber decapsulation time
+    decap_time = kyber_decapsulate(kem, ciphertext)
+    kyber_decap_time = time_to_cpu_kcycles(decap_time)
+    
+    # Free resources
+    kem.free()
+    falcon_priv_key.free()
+    
+    return {
+        "ECDHE_keygen_avg": ecdhe_keygen_time,
+        "Kyber_keygen_avg": kyber_keygen_time,
+        "Falcon_sign_avg": falcon_sign_time,
+        "Falcon_verify_avg": falcon_verify_time,
+        "Cert_verify_avg": cert_verify_time,
+        "Kyber_encapsulate_avg": kyber_encap_time,
+        "Kyber_decapsulate_avg": kyber_decap_time
+    }
+
+
+def test_hybrid_tls_mldsa():
+    """
+    Test and benchmark a hybrid TLS handshake with ECDHE+Kyber KEM and ML‑DSA (Dilithium3) post‑quantum signatures.
+    It benchmarks the following:
+        - ECDHE ephemeral keypair generation time (KeyGen)
+        - Kyber keypair generation time (KeyGen)
+        - ML‑DSA (Dilithium3) key generation time (KeyGen) if measured separately
+        - ML‑DSA signature generation time on handshake data (Sign)
+        - ML‑DSA signature verification time (Verify)
+        - Verification of the certificate chain (classic certs) (Verify)
+        - Kyber encapsulation time (Encapsulate)
+        - Kyber decapsulation time (Decapsulate)
+    Returns:
+        A dict with average times for:
+            "ECDHE_keygen_avg",
+            "Kyber_keygen_avg",
+            "MLDSA_keygen_avg",   
+            "MLDSA_sign_avg",
+            "MLDSA_verify_avg",
+            "Cert_verify_avg",
+            "Kyber_encapsulate_avg",
+            "Kyber_decapsulate_avg"
+    """
+    # Measure ECDHE key generation time
+    start = time.perf_counter()
+    ec_pub_key, ec_priv_key = ecdhe_keygen()
+    ecdhe_keygen_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Measure Kyber key generation time
+    start = time.perf_counter()
+    kem, kyber_pub_key = kyber_keygen()
+    kyber_keygen_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Measure ML-DSA key generation time
+    start = time.perf_counter()
+    mldsa_priv_key, mldsa_pub_key = mldsa_keygen()
+    mldsa_keygen_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Simulate handshake transcript data
+    handshake_transcript = b"Hybrid TLS with ML-DSA Handshake Transcript Data"
+    
+    # Measure ML-DSA signing time
+    start = time.perf_counter()
+    signature = mldsa_sign(mldsa_priv_key, handshake_transcript)
+    mldsa_sign_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Measure ML-DSA verification time
+    start = time.perf_counter()
+    _ = mldsa_verify(mldsa_priv_key, mldsa_pub_key, signature, handshake_transcript)
+    mldsa_verify_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Simulate certificate verification (using ECDSA as proxy for classic certs)
+    cert_data = b"TLS Certificate Chain Data"
+    cert_signature = ecdsa_sign(ec_priv_key, cert_data)
+    
+    start = time.perf_counter()
+    _ = ecdsa_verify(ec_pub_key, cert_signature, cert_data)
+    cert_verify_time = time_to_cpu_kcycles(time.perf_counter() - start)
+    
+    # Measure Kyber encapsulation time
+    encap_time, ciphertext = kyber_encapsulate(kem, kyber_pub_key)
+    kyber_encap_time = time_to_cpu_kcycles(encap_time)
+    
+    # Measure Kyber decapsulation time
+    decap_time = kyber_decapsulate(kem, ciphertext)
+    kyber_decap_time = time_to_cpu_kcycles(decap_time)
+    
+    # Free resources
+    kem.free()
+    mldsa_priv_key.free()
+    
+    return {
+        "ECDHE_keygen_avg": ecdhe_keygen_time,
+        "Kyber_keygen_avg": kyber_keygen_time,
+        "MLDSA_keygen_avg": mldsa_keygen_time,
+        "MLDSA_sign_avg": mldsa_sign_time,
+        "MLDSA_verify_avg": mldsa_verify_time,
+        "Cert_verify_avg": cert_verify_time,
+        "Kyber_encapsulate_avg": kyber_encap_time,
+        "Kyber_decapsulate_avg": kyber_decap_time
+    }
+
+
+
+def test_rsa_keygen(rounds=10):
+    """
+    Benchmarks RSA key generation operations.
+    Args:
+        rounds: Number of iterations of the test.
+    Returns:
+        Average time (in CPU cycles) to generate an RSA key pair.
+    """
+    times = []
+    for _ in range(rounds):
+        start = time.perf_counter()
+        _ = rsa_keygen()
+        times.append(time_to_cpu_kcycles(time.perf_counter() - start))
+    return statistics.mean(times)
+
+
+def test_rsa_sign_and_verify(rounds=10):
+    """
+    Benchmarks RSA signing and verification operations.
+    Uses 2048-bit RSA keys.
+    Args:
+        rounds: Number of iterations of the test.
+    Returns:
+        A tuple containing:
+            - Average signing time (in CPU cycles)
+            - Average verification time (in CPU cycles)
+    """
+    public_key, private_key = rsa_keygen()
+    message = b"Test message for RSA"
+    sign_times = []
+    verify_times = []
+    
+    for _ in range(rounds):
+        # Measuring the time of signing operations using rsa_sign function
+        sign_start = time.perf_counter()
+        signature = rsa_sign(private_key, message)
+        sign_end = time.perf_counter()
+        sign_times.append(time_to_cpu_kcycles(sign_end - sign_start))
+        
+        # Measuring the time of a verification operation using rsa_verify function
+        verify_start = time.perf_counter()
+        _ = rsa_verify(public_key, signature, message)
+        verify_end = time.perf_counter()
+        verify_times.append(time_to_cpu_kcycles(verify_end - verify_start))
+    
+    return statistics.mean(sign_times), statistics.mean(verify_times)
+
+
+def test_rsa_encrypt_and_decrypt(rounds=10):
+    """
+    Benchmarks RSA encryption and decryption operations.
+    Uses 2048-bit RSA keys.
+    Args:
+        rounds: Number of iterations to test.
+    Returns:
+        Tuple containing:
+            - Average encryption time (in CPU cycles)
+            - Average decryption time (in CPU cycles)
+    """
+    public_key, private_key = rsa_keygen()
+    data = b"A" * 190  # Sample data, 190 bytes (adjusted to fit RSA OAEP limits)
     encrypt_times = []
     decrypt_times = []
+    
     for _ in range(rounds):
-        data = b"A" * 190  # Sample data of 190 bytes (adjusted to fit RSA OAEP restrictions)
-        enc_start = time.perf_counter()
-        ciphertext = real_rsa_encrypt(public_key, data)
-        enc_end = time.perf_counter()
-        encrypt_times.append(time_to_cpu_kcycles(enc_end - enc_start))
-
-        dec_start = time.perf_counter()
-        _ = real_rsa_decrypt(private_key, ciphertext)
-        dec_end = time.perf_counter()
-        decrypt_times.append(time_to_cpu_kcycles(dec_end - dec_start))
-
-    return {
-        "ECDHE_handshake_avg": statistics.mean(ecdhe_times),
-        "RSA_encrypt_avg": statistics.mean(encrypt_times),
-        "RSA_decrypt_avg": statistics.mean(decrypt_times)
-    }
-
-
-def test_hybrid_tls(rounds=10):
-    """
-    Test and benchmark a hybrid TLS approach combining ECDHE and Kyber768.
-    It benchmarks the following:
-        - ECDHE handshake time
-        - Kyber encapsulation time
-        - Kyber decapsulation time
-    Args:
-        rounds: Number of iterations for each test.
-    Returns:
-        A dictionary with average times for:
-            "ECDHE_handshake_avg", "Kyber_encapsulate_avg", "Kyber_decapsulate_avg"
-    """
-    pub_ec, priv_ec = real_ecdhe_keygen()
-    kem, public_key = real_kyber_keygen()
-
-    ecdhe_times = []
-    kem_enc_times = []
-    kem_dec_times = []
-
-    for _ in range(rounds):
-        ecdhe_times.append(
-            time_to_cpu_kcycles(real_ecdhe_handshake(pub_ec, priv_ec))
-            )
-        enc_time, ciphertext = real_kyber_encapsulate(kem, public_key)
-        kem_enc_times.append(time_to_cpu_kcycles(enc_time))
-        dec_time = real_kyber_decapsulate(kem, ciphertext)
-        kem_dec_times.append(time_to_cpu_kcycles(dec_time))
-
-    # Free resources associated with the KEM object
-    kem.free()
-
-    return {
-        "ECDHE_handshake_avg": statistics.mean(ecdhe_times),
-        "Kyber_encapsulate_avg": statistics.mean(kem_enc_times),
-        "Kyber_decapsulate_avg": statistics.mean(kem_dec_times)
-    }
+        # Measuring the time of cryptographic operations
+        encrypt_start = time.perf_counter()
+        ciphertext = rsa_encrypt(public_key, data)
+        encrypt_end = time.perf_counter()
+        encrypt_times.append(time_to_cpu_kcycles(encrypt_end - encrypt_start))
+        
+        # Measuring the time of decryption operations
+        decrypt_start = time.perf_counter()
+        _ = rsa_decrypt(private_key, ciphertext)
+        decrypt_end = time.perf_counter()
+        decrypt_times.append(time_to_cpu_kcycles(decrypt_end - decrypt_start))
+    
+    return statistics.mean(encrypt_times), statistics.mean(decrypt_times)
 
 
 def test_ecdhe_keygen(rounds=10):
@@ -229,7 +782,7 @@ def test_ecdhe_keygen(rounds=10):
     times = []
     for _ in range(rounds):
         start = time.perf_counter()
-        _ = real_ecdhe_keygen()
+        _ = ecdhe_keygen()
         times.append(time_to_cpu_kcycles(time.perf_counter() - start))
     return statistics.mean(times)
 
@@ -245,20 +798,172 @@ def test_ecdsa_sign_and_verify(rounds=10):
             - Average signing time (in seconds)
             - Average verification time (in seconds)
     """
-    public_key, private_key = real_ecdhe_keygen()
+    public_key, private_key = ecdhe_keygen()
     message = b"Test message for ECDSA"
     sign_times = []
     verify_times = []
     for _ in range(rounds):
+        # Measuring the time of signing operations using ecdsa_sign function
         sign_start = time.perf_counter()
-        signature = private_key.sign(message, ec.ECDSA(hashes.SHA256()))
+        signature = ecdsa_sign(private_key, message)
         sign_end = time.perf_counter()
         sign_times.append(time_to_cpu_kcycles(sign_end - sign_start))
 
+        # Measuring the time of verification operations using ecdsa_verify function
         verify_start = time.perf_counter()
-        public_key.verify(signature, message, ec.ECDSA(hashes.SHA256()))
+        _ = ecdsa_verify(public_key, signature, message)
         verify_end = time.perf_counter()
         verify_times.append(time_to_cpu_kcycles(verify_end - verify_start))
+    return statistics.mean(sign_times), statistics.mean(verify_times)
+
+
+def test_kyber_keygen(rounds=10):
+    """
+    Benchmark the key generation operation for Kyber768.
+    Args:
+        rounds: Number of iterations for the test.
+    Returns:
+        The average time (in seconds) to generate a Kyber768 key pair.
+    """
+    times = []
+    for _ in range(rounds):
+        start = time.perf_counter()
+        kem, _ = kyber_keygen()
+        times.append(time_to_cpu_kcycles(time.perf_counter() - start))
+        # Release resources
+        kem.free()
+    return statistics.mean(times)
+
+def test_kyber_encapsulate_and_decapsulate(rounds=10):
+    """
+    Benchmark the encapsulation and decapsulation operations for Kyber768.
+    Args:
+        rounds: Number of iterations for the test.
+    Returns:
+        A tuple containing:
+            - Average encapsulation time (in CPU cycles)
+            - Average decapsulation time (in CPU cycles)
+    """
+    kem, public_key = kyber_keygen()
+    encap_times = []
+    decap_times = []
+    
+    for _ in range(rounds):
+        # Measure encapsulation time
+        encap_start = time.perf_counter()
+        enc_time, ciphertext = kyber_encapsulate(kem, public_key)
+        encap_end = time.perf_counter()
+        encap_times.append(time_to_cpu_kcycles(encap_end - encap_start))
+        
+        # Measure decapsulation time
+        decap_start = time.perf_counter()
+        _ = kyber_decapsulate(kem, ciphertext)
+        decap_end = time.perf_counter()
+        decap_times.append(time_to_cpu_kcycles(decap_end - decap_start))
+    
+    # Free resources associated with the KEM object
+    kem.free()
+    
+    return statistics.mean(encap_times), statistics.mean(decap_times)
+
+def test_mldsa_keygen(rounds=10):
+    """
+    Benchmark the key generation operation for ML-DSA (CRYSTALS-Dilithium).
+    Args:
+        rounds: Number of iterations for the test.
+    Returns:
+        The average time (in seconds) to generate a ML-DSA key pair.
+    """
+    times = []
+    for _ in range(rounds):
+        start = time.perf_counter()
+        private_key, _ = mldsa_keygen()
+        times.append(time_to_cpu_kcycles(time.perf_counter() - start))
+        # Release resources
+        private_key.free()
+    return statistics.mean(times)
+
+def test_mldsa_sign_and_verify(rounds=10):
+    """
+    Benchmark the ML-DSA signing and verification operations.
+    Args:
+        rounds: Number of iterations for the test.
+    Returns:
+        A tuple containing:
+            - Average signing time (in seconds)
+            - Average verification time (in seconds)
+    """
+    private_key, public_key = mldsa_keygen()
+    message = b"Test message for ML-DSA"
+    sign_times = []
+    verify_times = []
+    
+    for _ in range(rounds):
+        # Measuring the time of signing operations
+        sign_start = time.perf_counter()
+        signature = mldsa_sign(private_key, message)
+        sign_end = time.perf_counter()
+        sign_times.append(time_to_cpu_kcycles(sign_end - sign_start))
+        
+        # Measuring the time of verification operations
+        verify_start = time.perf_counter()
+        _ = mldsa_verify(private_key, public_key, signature, message)
+        verify_end = time.perf_counter()
+        verify_times.append(time_to_cpu_kcycles(verify_end - verify_start))
+    
+    # Free resources
+    private_key.free()
+    
+    return statistics.mean(sign_times), statistics.mean(verify_times)
+
+def test_falcon_keygen(rounds=10):
+    """
+    Benchmark the key generation operation for Falcon.
+    Args:
+        rounds: Number of iterations for the test.
+    Returns:
+        The average time (in seconds) to generate a Falcon key pair.
+    """
+    times = []
+    for _ in range(rounds):
+        start = time.perf_counter()
+        private_key, _ = falcon_keygen()
+        times.append(time_to_cpu_kcycles(time.perf_counter() - start))
+        # Release resources
+        private_key.free()
+    return statistics.mean(times)
+
+def test_falcon_sign_and_verify(rounds=10):
+    """
+    Benchmark the Falcon signing and verification operations.
+    Args:
+        rounds: Number of iterations for the test.
+    Returns:
+        A tuple containing:
+            - Average signing time (in seconds)
+            - Average verification time (in seconds)
+    """
+    private_key, public_key = falcon_keygen()
+    message = b"Test message for Falcon"
+    sign_times = []
+    verify_times = []
+    
+    for _ in range(rounds):
+        # Measuring the time of signing operations
+        sign_start = time.perf_counter()
+        signature = falcon_sign(private_key, message)
+        sign_end = time.perf_counter()
+        sign_times.append(time_to_cpu_kcycles(sign_end - sign_start))
+        
+        # Measuring the time of verification operations
+        verify_start = time.perf_counter()
+        _ = falcon_verify(private_key, public_key, signature, message)
+        verify_end = time.perf_counter()
+        verify_times.append(time_to_cpu_kcycles(verify_end - verify_start))
+    
+    # Free resources
+    private_key.free()
+    
     return statistics.mean(sign_times), statistics.mean(verify_times)
 
 
@@ -352,80 +1057,101 @@ def plot_bar_chart(title, labels, values, ylabel):
     for line in summary_lines:
         print(" ", line)
 
-    # Tight layout adjustment and show the plot
-    plt.tight_layout()
-    plt.show()
-
 
 # ============ 5. Main Program ============
 
 if __name__ == "__main__":
     rounds = 10  # Number of iterations for each benchmark test
 
-    # Benchmark Traditional TLS Operations
-    print("Running Traditional TLS Benchmark...")
-    trad_result = test_traditional_tls(rounds)
 
-    # Benchmark Hybrid (Post-Quantum) TLS Operations
-    print("\nRunning Hybrid TLS Benchmark...")
-    hybrid_result = test_hybrid_tls(rounds)
+    # Benchmark RSA Algorithm Performance
+    print("\nRunning RSA Key Generation, Encryption and Decryption Benchmark")
+    rsa_keygen_avg = test_rsa_keygen(rounds)
+    rsa_sign_avg, rsa_verify_avg = test_rsa_sign_and_verify(rounds)
+    rsa_encrypt_avg, rsa_decrypt_avg = test_rsa_encrypt_and_decrypt(rounds)
+    print(f"RSA KeyGen Avg: {rsa_keygen_avg:.6f} cycles")
+    print(f"RSA Sign   Avg: {rsa_sign_avg:.6f} cycles")
+    print(f"RSA Verify Avg: {rsa_verify_avg:.6f} cycles")
+    print(f"RSA Encrypt Avg: {rsa_encrypt_avg:.6f} cycles")
+    print(f"RSA Decrypt Avg: {rsa_decrypt_avg:.6f} cycles")
 
-    # Benchmark ECDHE Key Generation Performance
-    print("\nRunning ECDHE Key Generation Benchmark...")
+
+    # Benchmark Elliptic Curve Algorithm Performance
+    print("\nRunning Elliptic Curve Key Generation, Signing and Verification Benchmark")
     ecdhe_keygen_avg = test_ecdhe_keygen(rounds)
-    print(f"ECDHE KeyGen Avg: {ecdhe_keygen_avg:.6f} cycles")
-
-    # Benchmark ECDSA Signing and Verification Performance
-    print("\nRunning ECDSA Signing and Verification Benchmark...")
     ecdsa_sign_avg, ecdsa_verify_avg = test_ecdsa_sign_and_verify(rounds)
+    print(f"ECDHE KeyGen Avg: {ecdhe_keygen_avg:.6f} cycles")
     print(f"ECDSA Sign   Avg: {ecdsa_sign_avg:.6f} cycles")
     print(f"ECDSA Verify Avg: {ecdsa_verify_avg:.6f} cycles")
 
-    # Print Traditional TLS benchmark results to console
-    print("\nTraditional TLS Results:")
-    for k, v in trad_result.items():
+    # Benchmark Kyber Algorithm Performance
+    print("\nRunning Kyber Key Generation Benchmark...")
+    kyber_keygen_avg = test_kyber_keygen(rounds)
+    kyber_encrypt_avg, kyber_decrypt_avg = test_kyber_encapsulate_and_decapsulate(rounds)
+    print(f"Kyber KeyGen Avg: {kyber_keygen_avg:.6f} cycles")
+    print(f"Kyber Encrypt Avg: {kyber_encrypt_avg:.6f} cycles")
+    print(f"Kyber Decrypt Avg: {kyber_decrypt_avg:.6f} cycles")
+
+    # Benchmark ML-DSA Algorithm Performance
+    print("\nRunning ML-DSA Key Generation and Signing Benchmark...")
+    mldsa_keygen_avg = test_mldsa_keygen(rounds)
+    mldsa_sign_avg, mldsa_verify_avg = test_mldsa_sign_and_verify(rounds)
+    print(f"ML-DSA KeyGen Avg: {mldsa_keygen_avg:.6f} cycles")
+    print(f"ML-DSA Sign   Avg: {mldsa_sign_avg:.6f} cycles")
+    print(f"ML-DSA Verify Avg: {mldsa_verify_avg:.6f} cycles")
+
+    # Benchmark Falcon Algorithm Performance
+    print("\nRunning Falcon Key Generation and Signing Benchmark...")
+    falcon_keygen_avg = test_falcon_keygen(rounds)
+    falcon_sign_avg, falcon_verify_avg = test_falcon_sign_and_verify(rounds)
+    print(f"Falcon KeyGen Avg: {falcon_keygen_avg:.6f} cycles")
+    print(f"Falcon Sign   Avg: {falcon_sign_avg:.6f} cycles")
+    print(f"Falcon Verify Avg: {falcon_verify_avg:.6f} cycles")
+
+
+
+
+
+    # Benchmark test_traditional_tls_rsa_kex
+    print("\nRunning test_traditional_tls_rsa_kex Benchmark...")
+    trad_rsa_kex_result = test_traditional_tls_rsa_kex()
+    print("Traditional TLS RSA Key Exchange Results:")
+    for k, v in trad_rsa_kex_result.items():
         print(f"  {k}: {v:.6f} cycles")
 
-    # Print Hybrid TLS benchmark results to console
-    print("\nHybrid TLS Results:")
-    for k, v in hybrid_result.items():
+    # Benchmark test_traditional_tls_ecdhe_rsa
+    print("\nRunning test_traditional_tls_ecdhe_rsa Benchmark...")
+    trad_ecdhe_rsa_result = test_traditional_tls_ecdhe_rsa()
+    print("Traditional TLS ECDHE RSA Key Exchange Results:")
+    for k, v in trad_ecdhe_rsa_result.items():
         print(f"  {k}: {v:.6f} cycles")
 
-    # Plot benchmark results for Traditional TLS operations
-    plot_bar_chart("Traditional TLS (Average Time)",
-                   ["ECDHE Handshake", "RSA Encrypt", "RSA Decrypt"],
-                   [trad_result["ECDHE_handshake_avg"],
-                    trad_result["RSA_encrypt_avg"],
-                    trad_result["RSA_decrypt_avg"]],
-                   "Average k CPU Cycles")
+    # Benchmark test_traditional_tls_ecdhe_certsign
+    print("\nRunning test_traditional_tls_ecdhe_certsign Benchmark...")
+    trad_ecdhe_certsign_result = test_traditional_tls_ecdhe_certsign()
+    print("Traditional TLS ECDHE CertSign Results:")
+    for k, v in trad_ecdhe_certsign_result.items():
+        print(f"  {k}: {v:.6f} cycles")
+    
+    # Benchmark test_hybrid_tls_kyber
+    print("\nRunning test_hybrid_tls_kyber Benchmark...")
+    hybrid_kyber_result = test_hybrid_tls_kyber()
+    print("Hybrid TLS Kyber Results:")
+    for k, v in hybrid_kyber_result.items():
+        print(f"  {k}: {v:.6f} cycles")
+    
+    # Benchmark test_hybrid_tls_falcon
+    print("\nRunning test_hybrid_tls_falcon Benchmark...")
+    hybrid_falcon_result = test_hybrid_tls_falcon()
+    print("Hybrid TLS Falcon Results:")
+    for k, v in hybrid_falcon_result.items():
+        print(f"  {k}: {v:.6f} cycles")
 
-    # Missing Key Generation time for Kyber 
-    # Plot benchmark results for Hybrid TLS operations
-    plot_bar_chart("Hybrid Post-Quantum TLS (Average Time)",
-                   ["ECDHE Handshake", "Kyber Encapsulate", "Kyber Decapsulate"],
-                   [hybrid_result["ECDHE_handshake_avg"],
-                    hybrid_result["Kyber_encapsulate_avg"],
-                    hybrid_result["Kyber_decapsulate_avg"]],
-                   "Average k CPU Cycles")
+    # Benchmark test_hybrid_tls_mldsa
+    print("\nRunning test_hybrid_tls_mldsa Benchmark...")
+    hybrid_mldsa_result = test_hybrid_tls_mldsa()
+    print("Hybrid TLS ML-DSA Results:")
+    for k, v in hybrid_mldsa_result.items():
+        print(f"  {k}: {v:.6f} cycles")
 
-    # Plot benchmark results for ECDHE/ECDSA performance (Key Generation, Signing, and Verification)
-    plot_bar_chart("ECDHE/ECDSA Performance",
-                   ["KeyGen", "Sign", "Verify"],
-                   [ecdhe_keygen_avg, ecdsa_sign_avg, ecdsa_verify_avg],
-                   "Average k CPU Cycles")
 
-    # Plot security level (in bits) for each algorithm
-    algorithms = list(algo_info.keys())
-    plot_bar_chart("Estimated Bits of Security", algorithms,
-                   [algo_info[a]["bits_of_security"] for a in algorithms],
-                   "Bits")
-
-    # Plot public key sizes for each algorithm
-    plot_bar_chart("Public Key Size Comparison", algorithms,
-                   [algo_info[a]["public_key_size"] for a in algorithms],
-                   "Size (bytes)")
-
-    # Plot private key sizes for each algorithm
-    plot_bar_chart("Private Key Size Comparison", algorithms,
-                   [algo_info[a]["private_key_size"] for a in algorithms],
-                   "Size (bytes)")
