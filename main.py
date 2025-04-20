@@ -15,7 +15,7 @@ def save_benchmark_csv(title, mean, standard_deviation, max_value, min_value):
         min_value (float): Minimum value observed.
     """
     # Create results directory if it doesn't exist
-    filename = f"benchmark_data.csv" 
+    filename = f"Data and Visualization/benchmark_data.csv"
     csv_path = os.path.join(filename)
     
     # Write results to CSV
@@ -45,7 +45,7 @@ def print_benchmark_results(results):
 
 if __name__ == "__main__":
 
-    rounds = 500  # Number of iterations for each benchmark test
+    rounds = 1000  # Number of iterations for each benchmark test
 
     # Creating a benchmark instance
     crypto_benchmark = CryptographicBenchmark(rounds)
