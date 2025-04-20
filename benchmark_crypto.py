@@ -201,8 +201,8 @@ class CryptographicBenchmark:
         kem.free()
 
         return {
-            "Kyber_encapsulate": encap_times,
-            "Kyber_decapsulate": decap_times
+            "Kyber_encrypt": encap_times,
+            "Kyber_decrypt": decap_times
         }
 
     # ############## 4. ML-DSA (CRYSTALS-Dilithium) - Post-Quantum Digital Signature #############
