@@ -107,7 +107,7 @@ python3 -m pip install cryptography matplotlib numpy py-oqs
    Simply execute the Python script:
 
    ```bash
-   python3 benchmark_tls.py
+   python main.py
    ```
 
    The script will:
