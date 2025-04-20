@@ -122,6 +122,27 @@ python3 -m pip install cryptography matplotlib numpy py-oqs
 
 ## Expected Results
 
+
+| Algorithm      | KeyGen | Sign | Verify | Encrypt | Decrypt |
+|----------------|--------|------|--------|---------|---------|
+| **RSA**         | ✅     | ✅   | ✅     | ✅      | ✅      |
+| **Elliptic Curve** (ECDSA/ECDHE) | ✅     | ✅   | ✅     | ❌      | ❌      |
+| **Kyber**       | ✅     | ❌   | ❌     | ✅*     | ✅*     |
+| **ML-DSA**      | ✅     | ✅   | ✅     | ❌      | ❌      |
+| **Falcon**      | ✅     | ✅   | ✅     | ❌      | ❌      |
+
+---
+
+### 🔍 Notes:
+
+- **Encrypt/Decrypt for Kyber** marked as ✅* because Kyber doesn't provide general-purpose encryption like RSA; instead, it supports *key encapsulation*, which is used to establish shared secrets over an insecure channel.
+- **Elliptic Curve (ECDSA/ECDHE)** distinguishes between signing (ECDSA) and key agreement (ECDHE); it doesn't support direct encryption/decryption.
+- **ML-DSA** and **Falcon** are post-quantum signature algorithms — they only support digital signing and verification, not encryption.
+
+---
+
+
+
 The final output of the benchmark should appear similar to the example below:
 
 ```
