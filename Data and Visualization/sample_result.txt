@@ -1,0 +1,80 @@
+
+Running RSA Key Generation, Encryption and Decryption Benchmark...
+RSA_keygen: 261148.867583 kilo cycles (±159820.089777), max: 915208.209000, min: 40720.816500
+RSA_sign: 3462.548275 kilo cycles (±1147.051589), max: 25596.290424, min: 3284.893500
+RSA_verify: 122.220731 kilo cycles (±17.003528), max: 473.437848, min: 118.225500
+RSA_encrypt: 122.428847 kilo cycles (±189.079080), max: 4332.379500, min: 108.405924
+RSA_decrypt: 3484.300527 kilo cycles (±621.239729), max: 7364.682000, min: 3290.006652
+
+Running Elliptic Curve Key Generation, Signing and Verification Benchmark...
+ECDHE_keygen: 70.260868 kilo cycles (±205.355542), max: 4650.741000, min: 58.104000
+ECDSA_sign: 153.455395 kilo cycles (±1241.101708), max: 27848.091576, min: 94.151076
+ECDSA_verify: 213.769690 kilo cycles (±33.827017), max: 910.431576, min: 206.995500
+
+Running Kyber Key Generation Benchmark...
+Kyber_keygen: 69.591690 kilo cycles (±493.032749), max: 11071.233000, min: 45.056424
+Kyber_encapsulate: 48.612305 kilo cycles (±10.124107), max: 164.356848, min: 45.863424
+Kyber_decapsulate: 38.276894 kilo cycles (±4.445272), max: 91.191000, min: 36.718500
+
+Running ML-DSA Key Generation and Signing Benchmark...
+MLDSA_keygen: 173.306472 kilo cycles (±112.432720), max: 2648.170500, min: 159.518076
+MLDSA_sign: 349.926240 kilo cycles (±208.155183), max: 1330.743000, min: 143.646000
+MLDSA_verify: 116.478074 kilo cycles (±21.122988), max: 353.062500, min: 108.273576
+
+Running Falcon Key Generation and Signing Benchmark...
+Falcon_keygen: 17425.888597 kilo cycles (±4556.794470), max: 38676.014076, min: 13025.251152
+Falcon_sign: 504.428759 kilo cycles (±24.356135), max: 831.345576, min: 471.288000
+Falcon_verify: 97.984332 kilo cycles (±9.731287), max: 207.934848, min: 94.015500
+
+Running Traditional TLS RSA Key Exchange Benchmark...
+RSA_keygen: 257261.691079 kilo cycles (±152289.096669), max: 885584.181576, min: 51095.608500
+Cert_verify: 247.377761 kilo cycles (±31.004245), max: 465.099924, min: 223.942500
+RSA_encrypt: 128.597942 kilo cycles (±20.008206), max: 340.957500, min: 113.383500
+RSA_decrypt: 3365.123045 kilo cycles (±79.653369), max: 4275.486000, min: 3309.507000
+Total_time: 270147.373157 kilo cycles (±152382.024019), max: 899376.886500, min: 64149.237000
+
+Running Traditional TLS ECDHE RSA Key Exchange Benchmark...
+ECDHE_keygen: 122.151445 kilo cycles (±33.171642), max: 298.186500, min: 71.551848
+RSA_sign: 7107.882211 kilo cycles (±157.268196), max: 7955.270424, min: 6814.443576
+RSA_verify: 249.683134 kilo cycles (±28.666639), max: 490.923924, min: 228.245424
+Finished_encrypt: 127.435881 kilo cycles (±15.332058), max: 248.288076, min: 113.247924
+Finished_decrypt: 3357.520989 kilo cycles (±61.606483), max: 3761.698152, min: 3292.827924
+Total_time: 13344.944137 kilo cycles (±435.989318), max: 15043.422576, min: 12760.687500
+
+Running Traditional TLS ECDHE CertSign Key Exchange Benchmark...
+ECDHE_keygen: 115.601188 kilo cycles (±22.591136), max: 235.776348, min: 75.051000
+CertSign_sign: 200.881397 kilo cycles (±39.923800), max: 417.486924, min: 161.671152
+CertSign_verify: 283.469764 kilo cycles (±16.248425), max: 429.052848, min: 266.445576
+Finished_encrypt: 267.745614 kilo cycles (±49.083114), max: 474.112500, min: 218.697000
+Finished_decrypt: 7076.189132 kilo cycles (±129.144296), max: 7897.837848, min: 6821.706576
+Total_time: 268862.240576 kilo cycles (±158348.128604), max: 1236114.312348, min: 47644.337424
+
+Running Hybrid TLS Kyber Key Exchange Benchmark...
+ECDHE_keygen: 76.470009 kilo cycles (±16.203409), max: 253.530348, min: 70.612500
+Kyber_keygen: 55.542814 kilo cycles (±42.143120), max: 944.861424, min: 49.091424
+CertSign_sign: 159.752655 kilo cycles (±16.670911), max: 306.527652, min: 151.851576
+CertSign_verify: 267.809716 kilo cycles (±21.310040), max: 601.079424, min: 260.393076
+Kyber_encapsulate: 50.576595 kilo cycles (±11.064158), max: 161.400000, min: 46.938348
+Kyber_decapsulate: 38.331674 kilo cycles (±10.685825), max: 267.117000, min: 36.447348
+Total_time: 3160.425855 kilo cycles (±155.257749), max: 4389.540924, min: 3046.557348
+
+Running Hybrid TLS Falcon Key Exchange Benchmark...
+ECDHE_keygen: 79.120159 kilo cycles (±11.471451), max: 181.303848, min: 72.362076
+Kyber_keygen: 56.297618 kilo cycles (±8.663821), max: 116.882652, min: 50.301924
+Falcon_sign: 513.669761 kilo cycles (±28.770249), max: 838.205076, min: 477.340500
+Falcon_verify: 100.572840 kilo cycles (±6.921575), max: 186.684924, min: 95.629500
+Cert_verify: 269.094763 kilo cycles (±22.915580), max: 696.844500, min: 259.582848
+Kyber_encapsulate: 52.055296 kilo cycles (±9.001270), max: 157.229424, min: 47.209500
+Kyber_decapsulate: 38.473751 kilo cycles (±2.427088), max: 63.349500, min: 36.854076
+Total_time: 21061.143904 kilo cycles (±4067.516953), max: 45224.415576, min: 17126.557500
+
+Running Hybrid TLS ML-DSA Key Exchange Benchmark...
+ECDHE_keygen: 75.771728 kilo cycles (±11.844319), max: 161.128848, min: 70.744848
+Kyber_keygen: 52.114420 kilo cycles (±9.115216), max: 161.532348, min: 48.823500
+MLDSA_keygen: 169.496676 kilo cycles (±14.181240), max: 383.325000, min: 161.132076
+MLDSA_sign: 340.673746 kilo cycles (±209.130872), max: 1275.599076, min: 144.856500
+MLDSA_verify: 111.670000 kilo cycles (±7.137716), max: 199.061076, min: 108.809424
+Cert_verify: 261.806695 kilo cycles (±14.119116), max: 475.051848, min: 256.758348
+Kyber_encapsulate: 169.496676 kilo cycles (±14.181240), max: 383.325000, min: 161.132076
+Kyber_decapsulate: 37.578471 kilo cycles (±3.360044), max: 102.892500, min: 36.315000
+Total_time: 4597.138465 kilo cycles (±281.862219), max: 6139.523652, min: 4294.718424
