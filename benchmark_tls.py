@@ -22,12 +22,14 @@ class TLSBenchmark:
             - Certificate chain signature verification time (Verify)
             - RSA encryption of the pre‑master secret (Encrypt)
             - RSA decryption of the pre‑master secret (Decrypt)
+            
         Returns:
-            A dict with average times for:
-                "RSA_keygen_avg",
-                "Cert_verify_avg",
-                "RSA_encrypt_avg",
-                "RSA_decrypt_avg"
+            Dictionary containing:
+                - "RSA_keygen": List of RSA key generation times (in CPU cycles)
+                - "Cert_verify": List of certificate verification times (in CPU cycles)
+                - "RSA_encrypt": List of RSA encryption times (in CPU cycles)
+                - "RSA_decrypt": List of RSA decryption times (in CPU cycles)
+                - "Total_time": List of total operation times (in CPU cycles)
         """
         # Pre-define lists for collecting timing data
         keygen_time = []
@@ -81,13 +83,15 @@ class TLSBenchmark:
             - RSA verification of ServerKeyShare and certificate chain (Verify)
             - symmetric encryption of Finished message (Encrypt)
             - symmetric decryption of Finished message (Decrypt)
+            
         Returns:
-            A dict with average times for:
-                "ECDHE_keygen_avg",
-                "RSA_sign_avg",
-                "RSA_verify_avg",
-                "Finished_encrypt_avg",
-                "Finished_decrypt_avg"
+            Dictionary containing:
+                - "ECDHE_keygen": List of ECDHE key generation times (in CPU cycles)
+                - "RSA_sign": List of RSA signing times (in CPU cycles)
+                - "RSA_verify": List of RSA verification times (in CPU cycles)
+                - "Finished_encrypt": List of encryption times (in CPU cycles)
+                - "Finished_decrypt": List of decryption times (in CPU cycles)
+                - "Total_time": List of total operation times (in CPU cycles)
         """
         # Pre-define lists for collecting timing data
         ecdhe_keygen_time = []
@@ -152,13 +156,15 @@ class TLSBenchmark:
             - Verification of the certificate chain and handshake signature (Verify)
             - symmetric encryption of Finished/0-RTT messages (Encrypt)
             - symmetric decryption of Finished/0-RTT messages (Decrypt)
+            
         Returns:
-            A dict with average times for:
-                "ECDHE_keygen_avg",
-                "CertSign_sign_avg",
-                "CertSign_verify_avg",
-                "Finished_encrypt_avg",
-                "Finished_decrypt_avg"
+            Dictionary containing:
+                - "ECDHE_keygen": List of ECDHE key generation times (in CPU cycles)
+                - "CertSign_sign": List of certificate signing times (in CPU cycles)
+                - "CertSign_verify": List of certificate verification times (in CPU cycles)
+                - "Finished_encrypt": List of encryption times (in CPU cycles)
+                - "Finished_decrypt": List of decryption times (in CPU cycles)
+                - "Total_time": List of total operation times (in CPU cycles)
         """
         # Pre-define lists for collecting timing data
         ecdhe_keygen_time = []
@@ -224,14 +230,16 @@ class TLSBenchmark:
             - Verification of the certificate chain and signature (Verify)
             - Kyber encapsulation time (Encapsulate)
             - Kyber decapsulation time (Decapsulate)
+            
         Returns:
-            A dict with average times for:
-                "ECDHE_keygen_avg",
-                "Kyber_keygen_avg",
-                "CertSign_sign_avg",
-                "CertSign_verify_avg",
-                "Kyber_encapsulate_avg",
-                "Kyber_decapsulate_avg"
+            Dictionary containing:
+                - "ECDHE_keygen": List of ECDHE key generation times (in CPU cycles)
+                - "Kyber_keygen": List of Kyber key generation times (in CPU cycles)
+                - "CertSign_sign": List of certificate signing times (in CPU cycles)
+                - "CertSign_verify": List of certificate verification times (in CPU cycles)
+                - "Kyber_encapsulate": List of Kyber encapsulation times (in CPU cycles)
+                - "Kyber_decapsulate": List of Kyber decapsulation times (in CPU cycles)
+                - "Total_time": List of total operation times (in CPU cycles)
         """
         # Pre-define lists for collecting timing data
         ecdhe_keygen_time = []
@@ -301,14 +309,15 @@ class TLSBenchmark:
             - Kyber encapsulation time (Encapsulate)
             - Kyber decapsulation time (Decapsulate)
         Returns:
-            A dict with average times for:
-                "ECDHE_keygen_avg",
-                "Kyber_keygen_avg",
-                "Falcon_sign_avg",
-                "Falcon_verify_avg",
-                "Cert_verify_avg",
-                "Kyber_encapsulate_avg",
-                "Kyber_decapsulate_avg"
+            Dictionary containing:
+                - "ECDHE_keygen": List of ECDHE key generation times (in CPU cycles)
+                - "Kyber_keygen": List of Kyber key generation times (in CPU cycles)
+                - "Falcon_sign": List of Falcon signing times (in CPU cycles)
+                - "Falcon_verify": List of Falcon verification times (in CPU cycles)
+                - "Cert_verify": List of certificate verification times (in CPU cycles)
+                - "Kyber_encapsulate": List of Kyber encapsulation times (in CPU cycles)
+                - "Kyber_decapsulate": List of Kyber decapsulation times (in CPU cycles)
+                - "Total_time": List of total operation times (in CPU cycles)
         """
         # Pre-define lists for collecting timing data
         ecdhe_keygen_time = []
@@ -393,15 +402,16 @@ class TLSBenchmark:
             - Kyber encapsulation time (Encapsulate)
             - Kyber decapsulation time (Decapsulate)
         Returns:
-            A dict with average times for:
-                "ECDHE_keygen_avg",
-                "Kyber_keygen_avg",
-                "MLDSA_keygen_avg",
-                "MLDSA_sign_avg",
-                "MLDSA_verify_avg",
-                "Cert_verify_avg",
-                "Kyber_encapsulate_avg",
-                "Kyber_decapsulate_avg"
+            Dictionary containing:
+                - "ECDHE_keygen": List of ECDHE key generation times (in CPU cycles)
+                - "Kyber_keygen": List of Kyber key generation times (in CPU cycles)
+                - "MLDSA_keygen": List of ML-DSA key generation times (in CPU cycles)
+                - "MLDSA_sign": List of ML-DSA signing times (in CPU cycles)
+                - "MLDSA_verify": List of ML-DSA verification times (in CPU cycles)
+                - "Cert_verify": List of certificate verification times (in CPU cycles)
+                - "Kyber_encapsulate": List of Kyber encapsulation times (in CPU cycles)
+                - "Kyber_decapsulate": List of Kyber decapsulation times (in CPU cycles)
+                - "Total_time": List of total operation times (in CPU cycles)
         """
         # Pre-define lists for collecting timing data
         ecdhe_keygen_time = []
