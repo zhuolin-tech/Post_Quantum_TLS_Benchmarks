@@ -1,3 +1,4 @@
+The following results are based on 500 rounds of experiments, and the test device is a 2021 Macbook M1 Pro 16GB:
 
 Running RSA Key Generation, Encryption and Decryption Benchmark...
 RSA_keygen: 261148.867583 kilo cycles (±159820.089777), max: 915208.209000, min: 40720.816500
